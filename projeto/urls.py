@@ -17,9 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.http import HttpResponse
-
+from django.conf.urls.static import static #Necessário para importar os arquivos estáticos do projeto
+from django.conf import settings #Modo correto para importar os settings do projeto
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('recipes.urls')),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) #Necessário para mapear os arquivos de midia configurados no settings
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) #Necessário para mapear os arquivos estáticos configurados no settings
