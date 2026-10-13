@@ -31,6 +31,7 @@ def home(request):
     })
 
 def category(request, category_id):
+
     category = get_object_or_404(Category, id=category_id)
     recipes = Recipe.objects.filter(category=category, is_published=True).order_by('-id')
     return render(request, 'recipes/pages/category.html', context={
