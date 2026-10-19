@@ -1,6 +1,8 @@
 from django.shortcuts import render
+from django.http.response import Http404
 from utils.recipes.factory import make_recipe
 from .models import Recipe, Category
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 import nh3
 
@@ -49,3 +51,27 @@ def recipe(request, id):
         'recipe': recipe,
         'is_detail_page': True,
     })
+
+def search(request):
+    search_term = request.GET.get('q', '').strip()
+    
+    recipes = Recipe.objects.none()
+
+    if not search_term:
+        raise Http404()
+    
+    recipes = Recipe.objects.filter(
+            Q(title__icontains=search_term) |
+            Q(description__icontains=search_term) |
+            Q(category__name__icontains=search_term) |
+            Q(author__username__icontains=search_term) |
+            Q(author__first_name__icontains=search_term) |
+            Q(author__last_name__icontains=search_term),
+            is_published=True
+        ).order_by('-id')
+    context={
+        'recipes': recipes,
+        'search_term': search_term,
+        'page_title': search_term,
+    }
+    return render(request, 'recipes/pages/search.html', context)
