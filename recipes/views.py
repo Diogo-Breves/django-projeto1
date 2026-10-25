@@ -69,9 +69,13 @@ def search(request):
             Q(author__last_name__icontains=search_term),
             is_published=True
         ).order_by('-id')
+
+    quantidade = recipes.count()
+    
     context={
         'recipes': recipes,
         'search_term': search_term,
         'page_title': search_term,
+        'quantidade': quantidade,
     }
     return render(request, 'recipes/pages/search.html', context)
