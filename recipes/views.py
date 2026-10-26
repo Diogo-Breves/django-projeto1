@@ -4,6 +4,8 @@ from utils.recipes.factory import make_recipe
 from .models import Recipe, Category
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.core.paginator import Paginator
+from utils.pagination import make_pagination
 import nh3
 
 def sanitizar_html(conteudo):
@@ -27,17 +29,25 @@ def sanitizar_html(conteudo):
 
 def home(request):
     recipes = Recipe.objects.filter(is_published=True).order_by('-id')
+
+    page_obj, pagination_range = make_pagination(request, recipes, 6)
+
     return render(request, 'recipes/pages/home.html', context={
-        'recipes': recipes,
+        'recipes': page_obj,
         'is_detail_page': False,
+        'pagination_range': pagination_range,
     })
 
 def category(request, category_id):
 
     category = get_object_or_404(Category, id=category_id)
     recipes = Recipe.objects.filter(category=category, is_published=True).order_by('-id')
+
+    page_obj, pagination_range = make_pagination(request, recipes, 6)
+
     return render(request, 'recipes/pages/category.html', context={
-        'recipes': recipes,
+        'recipes': page_obj,
+        'pagination_range': pagination_range,
         'title': category.name
     })
 
@@ -71,9 +81,12 @@ def search(request):
         ).order_by('-id')
 
     quantidade = recipes.count()
+
+    page_obj, pagination_range = make_pagination(request, recipes, 6)
     
     context={
-        'recipes': recipes,
+        'recipes': page_obj,
+        'pagination_range': pagination_range,
         'search_term': search_term,
         'page_title': search_term,
         'quantidade': quantidade,
