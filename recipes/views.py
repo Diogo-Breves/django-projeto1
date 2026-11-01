@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
 from utils.pagination import make_pagination
+from django.contrib import messages
 import nh3
 
 def sanitizar_html(conteudo):
@@ -30,12 +31,18 @@ def sanitizar_html(conteudo):
 def home(request):
     recipes = Recipe.objects.filter(is_published=True).order_by('-id')
 
-    page_obj, pagination_range = make_pagination(request, recipes, 6)
+    #bloco de programação própria
+    paginator = Paginator(recipes, 3)
+    numero_pagina = request.GET.get('page')
+    pagina = paginator.get_page(numero_pagina)
+    
+    numeros = paginator.get_elided_page_range(number=pagina.number, on_each_side=2, on_ends=1)
+
 
     return render(request, 'recipes/pages/home.html', context={
-        'recipes': page_obj,
+        'recipes': pagina,
         'is_detail_page': False,
-        'pagination_range': pagination_range,
+        'numeros': numeros,
     })
 
 def category(request, category_id):
@@ -43,12 +50,17 @@ def category(request, category_id):
     category = get_object_or_404(Category, id=category_id)
     recipes = Recipe.objects.filter(category=category, is_published=True).order_by('-id')
 
-    page_obj, pagination_range = make_pagination(request, recipes, 6)
+    #bloco de programação própria
+    paginator = Paginator(recipes, 2)
+    numero_pagina = request.GET.get('page')
+    pagina = paginator.get_page(numero_pagina)
 
+    numeros = paginator.get_elided_page_range(number=pagina.number, on_each_side=2, on_ends=1)
+    
     return render(request, 'recipes/pages/category.html', context={
-        'recipes': page_obj,
-        'pagination_range': pagination_range,
-        'title': category.name
+        'recipes': pagina,
+        'title': category.name,
+        'numeros': numeros,
     })
 
 def recipe(request, id):
@@ -82,13 +94,19 @@ def search(request):
 
     quantidade = recipes.count()
 
-    page_obj, pagination_range = make_pagination(request, recipes, 6)
+    #bloco de programação própria
+    paginator = Paginator(recipes, 2)
+    numero_pagina = request.GET.get('page')
+    pagina = paginator.get_page(numero_pagina)
+
+    numeros = paginator.get_elided_page_range(number=pagina.number, on_each_side=2, on_ends=1)
     
     context={
-        'recipes': page_obj,
-        'pagination_range': pagination_range,
+        'recipes': pagina,
         'search_term': search_term,
         'page_title': search_term,
         'quantidade': quantidade,
+        'numeros': numeros,
+        'search_pag': f'&q={search_term}'
     }
     return render(request, 'recipes/pages/search.html', context)
