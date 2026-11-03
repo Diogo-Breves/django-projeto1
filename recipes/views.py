@@ -1,13 +1,14 @@
 from django.shortcuts import render
 from django.http.response import Http404
-from utils.recipes.factory import make_recipe
 from .models import Recipe, Category
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
-from utils.pagination import make_pagination
-from django.contrib import messages
 import nh3
+#from utils.pagination import make_pagination
+#from django.contrib import messages
+#from utils.recipes.factory import make_recipe
+
 
 def sanitizar_html(conteudo):
     tags_permitidas = {
@@ -37,7 +38,6 @@ def home(request):
     pagina = paginator.get_page(numero_pagina)
     
     numeros = paginator.get_elided_page_range(number=pagina.number, on_each_side=2, on_ends=1)
-
 
     return render(request, 'recipes/pages/home.html', context={
         'recipes': pagina,

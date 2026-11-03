@@ -23,6 +23,7 @@ from django.conf import settings #Modo correto para importar os settings do proj
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('recipes.urls')),
+    path('authors/', include('authors.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) #Necessário para mapear os arquivos de midia configurados no settings
