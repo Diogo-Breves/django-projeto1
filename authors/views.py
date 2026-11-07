@@ -1,14 +1,12 @@
 from django.shortcuts import render, redirect
 from . import forms
 from django.http.response import Http404
-from django.db.models import Q
-from django.shortcuts import get_object_or_404
-from django.core.paginator import Paginator
+
 
 
 def register_view(request):
     #if request.POST:
-    register_form_data = request.session.get('register_form_data', None)
+    register_form_data = request.session.pop('register_form_data', None)
     form = forms.RegisterForm(register_form_data)
     context= {'form': form}
     return render(request, 'authors/pages/register_view.html', context)
