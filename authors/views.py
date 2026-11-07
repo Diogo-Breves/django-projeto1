@@ -9,6 +9,14 @@ def register_view(request):
     register_form_data = request.session.pop('register_form_data', None)
     form = forms.RegisterForm(register_form_data)
     context= {'form': form}
+
+    print(
+    "Password presente?",
+    'password' in (register_form_data or {})
+    )
+    print("Formulário válido?", form.is_valid())
+    print("Erros:", form.errors)
+
     return render(request, 'authors/pages/register_view.html', context)
 
 
