@@ -1,8 +1,15 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
 
 class RegisterForm(forms.ModelForm):
+    email = forms.EmailField(
+        required=True,
+        max_length=254,
+        label="E-mail:",
+        widget=forms.EmailInput(attrs={"placeholder": "Digite seu e-mail aqui"})
+        )
     confirm_password = forms.CharField(
         required=True,
         label="Repita a senha:",
@@ -33,6 +40,8 @@ class RegisterForm(forms.ModelForm):
     def clean_password(self):
         data = self.cleaned_data['password']
 
+        validate_password(data)
+
         if "teste" in data:
             raise ValidationError(
                 "Não digite teste",
@@ -57,6 +66,18 @@ class RegisterForm(forms.ModelForm):
 
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
+
+        if password:
+            user = User(
+                first_name = cleaned_data.get("first_name") or "",
+                last_name = cleaned_data.get("last_name") or "",
+                username = cleaned_data.get("username") or "",
+                email = cleaned_data.get("email") or "",
+            )
+            try:
+                validate_password(password, user=user)
+            except ValidationError as error:
+                self.add_error("password", error)
 
         if password and confirm_password:
             if password != confirm_password:
